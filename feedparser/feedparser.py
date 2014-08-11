@@ -507,6 +507,8 @@ class _FeedParserMixin:
         'http://www.w3.org/1999/xlink':                          'xlink',
         'http://www.w3.org/XML/1998/namespace':                  'xml',
         'http://podlove.org/simple-chapters':                    'psc',
+        'http://www.as-guides.com/schema/epg':                   'epg',
+        'http://www.as-guides.com/schema/channel':               'ch',
     }
     _matchnamespaces = {}
 
@@ -1917,6 +1919,41 @@ class _FeedParserMixin:
             context = self._getContext()['psc_chapters']
             context['chapters'].append(FeedParserDict(attrsD))
 
+    def _start_epg_tit(self, attrsD):
+        self.push('epg_tit', 0)
+        self._getContext()['epg_tit'] = FeedParserDict(attrsD)
+
+    def _end_epg_tit(self):
+        value = self.pop('epg_tit')
+        context = self._getContext()
+        context['epg_tit']['content'] = value
+
+    def _start_epg_shsyn(self, attrsD):
+        self.push('epg_shsyn', 0)
+        self._getContext()['epg_shsyn'] = FeedParserDict(attrsD)
+
+    def _end_epg_shsyn(self):
+        value = self.pop('epg_shsyn')
+        context = self._getContext()
+        context['epg_shsyn']['content'] = value
+
+    def _start_epg_losyn(self, attrsD):
+        self.push('epg_losyn', 0)
+        self._getContext()['epg_losyn'] = FeedParserDict(attrsD)
+
+    def _end_epg_losyn(self):
+        value = self.pop('epg_losyn')
+        context = self._getContext()
+        context['epg_losyn']['content'] = value
+
+    def _start_epg_url(self, attrsD):
+        self.push('epg_url', 0)
+        self._getContext()['epg_url'] = FeedParserDict(attrsD)
+
+    def _end_epg_url(self):
+        value = self.pop('epg_url')
+        context = self._getContext()
+        context['epg_url']['url'] = value
 
 if _XML_AVAILABLE:
     class _StrictFeedParser(_FeedParserMixin, xml.sax.handler.ContentHandler):
@@ -2676,7 +2713,7 @@ def _open_resource(url_file_stream_or_string, etag, modified, agent, referrer, h
         opener = urllib2.build_opener(*tuple(handlers + [_FeedURLHandler()]))
         opener.addheaders = [] # RMK - must clear so we only send our custom User-Agent
         try:
-            return opener.open(request)
+            return opener.open(request, timeout=7)
         finally:
             opener.close() # JohnD
 

@@ -1928,6 +1928,15 @@ class _FeedParserMixin:
         context = self._getContext()
         context['epg_tit']['content'] = value
 
+    def _start_epg_stit(self, attrsD):
+        self.push('epg_stit', 0)
+        self._getContext()['epg_stit'] = FeedParserDict(attrsD)
+
+    def _end_epg_stit(self):
+        value = self.pop('epg_stit')
+        context = self._getContext()
+        context['epg_stit']['content'] = value
+
     def _start_epg_shsyn(self, attrsD):
         self.push('epg_shsyn', 0)
         self._getContext()['epg_shsyn'] = FeedParserDict(attrsD)
